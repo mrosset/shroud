@@ -1,0 +1,7 @@
+#!@GUILE@ --no-auto-compile
+-*- mode: scheme -*-
+!#
+
+(use-modules (shroud ui))
+
+(apply shroud-main (cdr (command-line)))
