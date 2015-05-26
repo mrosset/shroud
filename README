@@ -13,10 +13,13 @@ with a [[gnupg.org][GnuPG]] key.
     # Replace an existing secret
     shroud hide --replace --id=bank-account --username=foobar --password=hackmepls
 
-    # Show a saved password
+    # Show a saved secret
     shroud show bank-account
 
-    # Delete a password
+    # Show just the password
+    shroud show --password bank-account
+
+    # Delete a secret
     shroud remove bank-account
   #+END_SRC
 
