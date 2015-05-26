@@ -58,6 +58,6 @@ Remove a secret from the database.~%")
          (db   (secrets-by-id (force db))))
 
     (unless (vhash-ref db id)
-      (leave "secret '~a' is undefined" id))
+      (leave "~a: secret undefined" id))
 
     (vhash-values (vhash-delete id db))))
