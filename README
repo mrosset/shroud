@@ -17,7 +17,7 @@ with a [[gnupg.org][GnuPG]] key.
     shroud show bank-account
 
     # Delete a password
-    shroud remove "personal email"
+    shroud remove bank-account
   #+END_SRC
 
 * Dependencies
