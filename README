@@ -7,20 +7,17 @@ with a [[gnupg.org][GnuPG]] key.
 * Usage
 
   #+BEGIN_SRC sh
-    # Add a new password
-    shroud add "bank account" hackme
+    # Add a new secret
+    shroud hide --id=bank-account --username=foobar --password=hackme
+
+    # Replace an existing secret
+    shroud hide --replace --id=bank-account --username=foobar --password=hackmepls
 
     # Show a saved password
-    shroud show "bank account"
-
-    # Show all passwords
-    shroud list-all
+    shroud show bank-account
 
     # Delete a password
     shroud remove "personal email"
-
-    # Delete all passwords
-    shroud clear
   #+END_SRC
 
 * Dependencies

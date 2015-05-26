@@ -41,4 +41,7 @@ SOURCES = 					\
   shroud/config.scm				\
   shroud/utils.scm				\
   shroud/secret.scm				\
-  shroud/ui.scm
+  shroud/ui.scm					\
+  shroud/ui/hide.scm				\
+  shroud/ui/remove.scm				\
+  shroud/ui/show.scm

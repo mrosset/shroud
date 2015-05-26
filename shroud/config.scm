@@ -15,13 +15,6 @@
 ;;; along with Shroud.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (shroud config)
-  #:export (%shroud-version
-            %shroud-gpg-binary
-            %shroud-database-file
-            %shroud-user-id))
+  #:export (%shroud-version))
 
 (define %shroud-version "0.1")
-(define %shroud-gpg-binary "gpg")
-(define %shroud-database-file
-  (string-append (getenv "HOME") "/.shroud-db"))
-(define %shroud-user-id #f)

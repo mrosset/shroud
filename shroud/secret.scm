@@ -16,41 +16,61 @@
 
 (define-module (shroud secret)
   #:use-module (ice-9 match)
+  #:use-module (ice-9 vlist)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
+  #:use-module (shroud utils)
   #:export (make-secret
             secret?
             secret-id
-            secret-content
+            secret-username
+            secret-password
             alist->secret
             secret->alist
             load-secrets
-            save-secrets))
+            save-secrets
+            secrets-by-id))
 
 (define-record-type <secret>
-  (make-secret id content)
+  (make-secret id username password)
   secret?
-  (id      secret-id)
-  (content secret-content))
+  (id       secret-id)
+  (username secret-username)
+  (password secret-password))
 
 (define (alist->secret alist)
   "Convert ALIST into a <secret> record."
-  (make-secret (assq-ref alist 'id) (assq-ref alist 'content)))
+  (make-secret (assq-ref alist 'id)
+               (assq-ref alist 'username)
+               (assq-ref alist 'password)))
 
 (define (secret->alist secret)
   "Convert SECRET into an alist."
   (match secret
-    (($ <secret> id content)
+    (($ <secret> id username password)
      `((id . ,id)
-       (content . ,content)))))
+       (username . ,username)
+       (password . ,password)))))
 
 (define (load-secrets file)
   "Load secrets from FILE, or return '() if FILE does not exist."
   (if (file-exists? file)
-      (map alist->secret (call-with-input-file file read))
+      (map alist->secret
+           ;; Handle existing file that isn't PGP encrypted.
+           (let ((stored (call-with-decrypted-input-file file read)))
+             (if (eof-object? stored)
+                 (throw 'decrypt-fail file)
+                 stored)))
       '()))
 
-(define (save-secrets secrets file)
-  "Write SECRETS to FILE."
-  (call-with-output-file file
+(define (save-secrets secrets file user-id)
+  "Write SECRETS to FILE, encrypted for USER-ID."
+  (call-with-encrypted-output-file file user-id
     (lambda (port)
       (write (map secret->alist secrets) port))))
+
+(define (secrets-by-id secrets)
+  "Convert the list SECRETS into a vhash keyed off of the secret id."
+  (fold (lambda (secret result)
+          (vhash-cons (secret-id secret) secret result))
+        vlist-null secrets))

@@ -19,18 +19,28 @@
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-37)
   #:use-module (shroud config)
+  #:use-module (shroud utils)
   #:use-module (shroud secret)
-  #:export (program-name
+  #:export (simple-args-fold
+            program-name
             show-version-and-exit
             leave
             make-user-module
             load*
             shroud-main))
 
+(define (simple-args-fold args options default-options)
+  (args-fold args options
+             (lambda (opt name arg result)
+               (leave "~A: unrecognized option" name))
+             (lambda (arg result)
+               (leave "~A: extraneuous argument" arg))
+             default-options))
+
 (define program-name (make-parameter "shroud"))
 
 (define %commands
-  '("add" "show" "list-all" "remove" "clear"))
+  '("hide" "show" "remove"))
 
 (define (show-help)
   (format #t "Usage: shroud COMMAND ARGS...
@@ -104,9 +114,14 @@ ARGS is the list of arguments received by the 'throw' handler."
 
 (define (load-config)
   "Load and evaluate user configuration file."
-  (append (load* (string-append (getenv "HOME") "/.shroud")
-                 (make-user-module '((shroud config))))
-          %default-config))
+  (let ((config (append (load* (string-append (getenv "HOME") "/.shroud")
+                               (make-user-module '((shroud config))))
+                        %default-config)))
+
+    (unless (assq-ref config 'user-id)
+      (leave "user-id must be specified in configuration"))
+
+    config))
 
 (define (command-proc command)
   "Return the procedure for COMMAND."
@@ -139,9 +154,19 @@ ARGS is the list of arguments received by the 'throw' handler."
     (((= string->symbol command) . args)
      (let* ((config  (load-config))
             (db-file (assq-ref config 'database-file))
-            (db      (load-secrets db-file))
-            (proc    (command-proc command))
-            (result  (parameterize ((program-name (make-program-name command)))
-                       (apply proc config db args))))
-       (unless (eq? db result)
-         (save-secrets result db-file))))))
+            (user-id (assq-ref config 'user-id))
+            (gpg     (assq-ref config 'gpg-binary)))
+       (parameterize ((gpg-binary gpg))
+         ;; Don't load database until needed to avoid pinentry prompt
+         ;; when running commands like 'shroud show --help'.
+         (let* ((db     (delay
+                          (catch 'decrypt-fail
+                            (lambda () (load-secrets db-file))
+                            (lambda (key file)
+                              (leave "~a: could not decrypt database" file)))))
+                (proc   (command-proc command))
+                (result (parameterize ((program-name (make-program-name
+                                                      command)))
+                          (apply proc config db args))))
+           (unless (eq? db result)
+             (save-secrets result db-file user-id))))))))
