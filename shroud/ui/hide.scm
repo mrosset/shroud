@@ -59,7 +59,7 @@ Add a new secret to the database.~%")
                 (lambda args
                   (show-help)
                   (exit 0)))
-        (option '("--version") #f #f
+        (option '("version") #f #f
                 (lambda args
                   (show-version-and-exit)))))
 
