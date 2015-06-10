@@ -23,8 +23,8 @@
   #:export (make-secret
             secret?
             secret-id
-            secret-username
-            secret-password
+            secret-contents
+            secret-ref
             alist->secret
             secret->alist
             load-secrets
@@ -32,25 +32,26 @@
             secrets-by-id))
 
 (define-record-type <secret>
-  (make-secret id username password)
+  (make-secret id contents)
   secret?
   (id       secret-id)
-  (username secret-username)
-  (password secret-password))
+  (contents secret-contents))
+
+(define (secret-ref secret key)
+  "Return the secret data associated with KEY in SECRET."
+  (assoc-ref (secret-contents secret) key))
 
 (define (alist->secret alist)
   "Convert ALIST into a <secret> record."
   (make-secret (assq-ref alist 'id)
-               (assq-ref alist 'username)
-               (assq-ref alist 'password)))
+               (assq-ref alist 'contents)))
 
 (define (secret->alist secret)
   "Convert SECRET into an alist."
   (match secret
-    (($ <secret> id username password)
+    (($ <secret> id contents)
      `((id . ,id)
-       (username . ,username)
-       (password . ,password)))))
+       (contents . ,contents)))))
 
 (define (load-secrets file)
   "Load secrets from FILE, or return '() if FILE does not exist."

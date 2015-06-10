@@ -70,10 +70,10 @@ Show secret named ID.~%")
         (leave "~a: secret undefined" id))
 
       (if password?
-          (display (secret-password secret))
+          (display (secret-ref secret "password"))
           (format #t "username: ~a~%password: ~a~%"
-               (secret-username secret)
-               (secret-password secret)))))
+                  (secret-ref secret "username")
+                  (secret-ref secret "password")))))
 
   ;; We don't alter the database.
   db)
