@@ -23,6 +23,7 @@
   #:export (vhash-ref
             vhash-replace
             vhash-values
+            alist-compact
             gpg-binary
             call-with-encrypted-output-file
             call-with-decrypted-input-file))
@@ -43,6 +44,19 @@ such key."
   (vhash-fold-right (lambda (key value result)
                       (cons value result))
                     '() vhash))
+
+(define (alist-compact alist)
+  "Remove all duplicate keys from ALIST."
+  (let loop ((alist alist)
+             (keys '())
+             (result '()))
+    (match alist
+      (() (reverse result))
+      (((key . value) . tail)
+       (if (member key keys)
+           (loop tail keys result)
+           (loop tail (cons key keys)
+                 (alist-cons key value result)))))))
 
 (define gpg-binary (make-parameter "gpg"))
 
