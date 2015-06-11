@@ -26,16 +26,10 @@
   #:export (shroud-hide))
 
 (define (show-help)
-  (format #t "Usage: shroud hide [OPTION] --id=ID --username=USERNAME --password=PASSWORD
-Add a new secret to the database.~%")
+  (format #t "Usage: shroud hide [OPTION] ID KEY=VALUE ...
+Add a new secret named ID to the database.~%")
   (display "
-  -i, --id               unique ID for secret")
-  (display "
-  -u, --username         username")
-  (display "
-  -p, --password         password")
-  (display "
-  -r, --replace          replace existing username/password if it exists")
+  -e, --edit             replace existing username/password if it exists")
   (display "
   -h, --help             display this help and exit")
   (display "
@@ -43,18 +37,9 @@ Add a new secret to the database.~%")
   (newline))
 
 (define %options
-  (list (option '(#\i "id") #t #f
+  (list (option '(#\e "edit") #f #f
                 (lambda (opt name arg result)
-                  (alist-cons 'id arg result)))
-        (option '(#\u "username") #t #f
-                (lambda (opt name arg result)
-                  (alist-cons 'username arg result)))
-        (option '(#\p "password") #t #f
-                (lambda (opt name arg result)
-                  (alist-cons 'password arg result)))
-        (option '(#\r "replace") #f #f
-                (lambda (opt name arg result)
-                  (alist-cons 'replace? #t result)))
+                  (alist-cons 'edit? #t result)))
         (option '(#\h "help") #f #f
                 (lambda args
                   (show-help)
@@ -65,28 +50,47 @@ Add a new secret to the database.~%")
 
 (define %default-options '())
 
+(define (process-args args)
+  (args-fold args %options
+             (lambda (opt name arg result)
+               (leave "~A: unrecognized option" name))
+             (lambda (arg result)
+               ;; The first unnamed argument is the secret id.  Each
+               ;; subsequent argument is a key/value pair.
+               (if (assq-ref result 'id)
+                   (match (string-split arg #\=)
+                     ((key value)
+                      (alist-cons 'secret (cons key value) result))
+                     (_ (leave "~A: invalid key/value pair" arg)))
+                   (alist-cons 'id arg result)))
+             %default-options))
+
 (define (shroud-hide config db . args)
-  (let* ((opts     (simple-args-fold args %options %default-options))
+  (let* ((opts     (process-args args))
          (id       (assq-ref opts 'id))
-         (username (assq-ref opts 'username))
-         (password (assq-ref opts 'password))
-         (replace? (assq-ref opts 'replace?)))
+         (contents (filter-map (match-lambda
+                                 (('secret . pair) pair)
+                                 (_ #f))
+                               opts))
+         (edit?    (assq-ref opts 'edit?)))
 
     (unless id
       (leave "no secret id specified"))
-    (unless username
-      (leave "no username specified"))
-    (unless password
-      (leave "no password specified"))
+    (when (null? contents)
+      (leave "no key/value pairs specified"))
 
     (let* ((db       (secrets-by-id (force db)))
            (existing (vhash-ref db id))
-           (vcons    (if existing vhash-replace vhash-cons))
-           (contents `(("username" . ,username)
-                       ("password" . ,password)))
-           (secret   (make-secret id contents)))
+           (vcons    (if existing vhash-replace vhash-cons)))
 
-      (when (and (not replace?) existing)
+      (when (and (not edit?) existing)
         (leave "~a: secret already defined" id))
+      (when (and edit? (not existing))
+        (leave "~a: secret undefined" id))
 
-      (vhash-values (vcons id secret db)))))
+      (let* ((contents (if edit?
+                           (alist-compact
+                            (append contents (secret-contents existing)))
+                           contents))
+             (secret   (make-secret id contents)))
+        (vhash-values (vcons id secret db))))))
