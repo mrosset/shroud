@@ -40,7 +40,7 @@
 (define program-name (make-parameter "shroud"))
 
 (define %commands
-  '("hide" "show" "remove"))
+  '("hide" "list" "show" "remove"))
 
 (define (show-help)
   (format #t "Usage: shroud COMMAND ARGS...
