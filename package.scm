@@ -29,7 +29,7 @@
 (package
   (name "shroud")
   (version "0.1")
-  (source (dirname (current-filename)))
+  (source #f)
   (build-system gnu-build-system)
   (native-inputs
    `(("pkg-config" ,pkg-config)
