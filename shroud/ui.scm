@@ -25,6 +25,7 @@
             program-name
             show-version-and-exit
             leave
+            leave-if-false
             make-user-module
             load*
             shroud-main))
@@ -66,6 +67,11 @@ There is NO WARRANTY, to the extent permitted by law.~%"
   (apply format (current-error-port) format-string args)
   (newline)
   (exit 1))
+
+(define (leave-if-false obj error . args)
+  "Display error message defined by the ERROR string and ARGS if OBJ
+is #f."
+  (or obj (apply leave error args)))
 
 (define (make-user-module modules)
   "Return a new user module with the additional MODULES loaded."
