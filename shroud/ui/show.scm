@@ -25,10 +25,8 @@
   #:export (shroud-show))
 
 (define (show-help)
-  (format #t "Usage: shroud show [OPTION] id
+  (format #t "Usage: shroud show [OPTION] ID [KEY ...]
 Show secret named ID.~%")
-  (display "
-  -p, --password         show only the password")
   (display "
   -h, --help             display this help and exit")
   (display "
@@ -42,38 +40,39 @@ Show secret named ID.~%")
                   (exit 0)))
         (option '("version") #f #f
                 (lambda args
-                  (show-version-and-exit)))
-        (option '(#\p "password") #f #f
-                (lambda (opt name arg result)
-                  (alist-cons 'password #t result)))))
+                  (show-version-and-exit)))))
 
 (define %default-options '())
 
+(define (process-args args)
+  (args-fold args %options
+             (lambda (opt name arg result)
+               (leave "~A: unrecognized option" name))
+             (lambda (arg result)
+               (if (assq-ref result 'id)
+                   (alist-cons 'key arg result)
+                   (alist-cons 'id arg result)))
+             %default-options))
+
 (define (shroud-show config db . args)
-  (let* ((opts      (args-fold args %options
-                               (lambda (opt name arg result)
-                                 (leave "~A: unrecognized option" name))
-                               (lambda (arg result)
-                                 (if (assq-ref result 'id)
-                                     (leave "~A: extraneuous argument" arg)
-                                     (alist-cons 'id arg result)))
-                               %default-options))
-         (id        (assq-ref opts 'id))
-         (password? (assq-ref opts 'password)))
+  (let* ((opts   (process-args args))
+         (id     (leave-if-false (assq-ref opts 'id)
+                                 "No secret ID given"))
+         (keys   (alist-pick opts 'key))
+         (secret (vhash-ref (secrets-by-id (force db)) id)))
 
-    (unless id
-      (leave "no secret id specified"))
+    (match keys
+      (()
+       (for-each (match-lambda
+                  ((key . value)
+                   (format #t "~a\t~a~%" key value)))
+                 (secret-contents secret)))
+      ((keys ...)
+       (for-each (match-lambda
+                  ((key . value)
+                   (when (member key keys)
+                     (format #t "~a~%" value))))
+                 (secret-contents secret))))
 
-    (let* ((db     (secrets-by-id (force db)))
-           (secret (vhash-ref db id)))
-      (unless secret
-        (leave "~a: secret undefined" id))
-
-      (if password?
-          (display (secret-ref secret "password"))
-          (format #t "username: ~a~%password: ~a~%"
-                  (secret-ref secret "username")
-                  (secret-ref secret "password")))))
-
-  ;; We don't alter the database.
-  db)
+    ;; Database remains unaltered.
+    db))
