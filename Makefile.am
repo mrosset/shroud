@@ -46,3 +46,7 @@ SOURCES = 					\
   shroud/ui/list.scm				\
   shroud/ui/remove.scm				\
   shroud/ui/show.scm
+
+EXTRA_DIST +=					\
+  pre-inst-env.in				\
+  package.scm
