@@ -24,6 +24,7 @@
             vhash-replace
             vhash-values
             alist-compact
+            alist-pick
             gpg-binary
             call-with-encrypted-output-file
             call-with-decrypted-input-file))
@@ -57,6 +58,16 @@ such key."
            (loop tail keys result)
            (loop tail (cons key keys)
                  (alist-cons key value result)))))))
+
+(define (alist-pick alist key)
+  "Return a list of the values in ALIST that are associated with KEY."
+  (fold-right (lambda (key+value result)
+          (match key+value
+            ((k . value)
+             (if (equal? key k)
+                 (cons value result)
+                 result))))
+        '()  alist))
 
 (define gpg-binary (make-parameter "gpg"))
 
