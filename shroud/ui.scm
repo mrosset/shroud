@@ -115,7 +115,7 @@ ARGS is the list of arguments received by the 'throw' handler."
       (report-load-error file args))))
 
 (define %default-config
-  `((database-file . ,(string-append (getenv "HOME") "/.shroud-db"))
+  `((database-file . ,(string-append (getenv "HOME") "/.config/shroud/db.gpg"))
     (gpg-binary    . "gpg")))
 
 (define (load-config)
@@ -175,4 +175,5 @@ ARGS is the list of arguments received by the 'throw' handler."
                                                       command)))
                           (apply proc config db args))))
            (unless (eq? db result)
+             (mkdir-p (dirname db-file))
              (save-secrets result db-file user-id))))))))
