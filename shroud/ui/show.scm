@@ -28,6 +28,8 @@
   (format #t "Usage: shroud show [OPTION] ID [KEY ...]
 Show secret named ID.~%")
   (display "
+  -c, --clipboard        copy output to the X clipboard")
+  (display "
   -h, --help             display this help and exit")
   (display "
   --version              display version information and exit")
@@ -40,7 +42,10 @@ Show secret named ID.~%")
                   (exit 0)))
         (option '("version") #f #f
                 (lambda args
-                  (show-version-and-exit)))))
+                  (show-version-and-exit)))
+        (option '("clipboard" #\c) #f #f
+                (lambda (opt name arg result)
+                  (alist-cons 'clipboard? #t result)))))
 
 (define %default-options '())
 
@@ -54,28 +59,38 @@ Show secret named ID.~%")
                    (alist-cons 'id arg result)))
              %default-options))
 
+(define* (display-secret secret keys #:optional (port (current-output-port)))
+  (match keys
+    (()
+     (for-each (match-lambda
+                ((key . value)
+                 (format port "~a\t~a~%" key value)))
+               (secret-contents secret)))
+    ((keys ...)
+     (for-each (match-lambda
+                ((key . value)
+                 (when (member key keys)
+                   (format port "~a~%" value))))
+               (secret-contents secret)))))
+
 (define (shroud-show config db . args)
-  (let* ((opts   (process-args args))
-         (id     (leave-if-false (assq-ref opts 'id)
-                                 "no secret ID given"))
-         (keys   (alist-pick opts 'key))
-         (secret (vhash-ref (secrets-by-id (force db)) id)))
+  (let* ((opts       (process-args args))
+         (id         (leave-if-false (assq-ref opts 'id)
+                                     "no secret ID given"))
+         (keys       (alist-pick opts 'key))
+         (clipboard? (assq-ref opts 'clipboard?))
+         (secret     (vhash-ref (secrets-by-id (force db)) id)))
 
     (unless secret
       (leave "secret '~a' does not exist" id))
 
-    (match keys
-      (()
-       (for-each (match-lambda
-                  ((key . value)
-                   (format #t "~a\t~a~%" key value)))
-                 (secret-contents secret)))
-      ((keys ...)
-       (for-each (match-lambda
-                  ((key . value)
-                   (when (member key keys)
-                     (format #t "~a~%" value))))
-                 (secret-contents secret))))
+    (if clipboard?
+        (call-with-clipboard
+         (lambda (port)
+           (display-secret secret keys port)
+           (display "copied secret to clipboard\n"
+                    (current-error-port))))
+        (display-secret secret keys))
 
     ;; Database remains unaltered.
     db))

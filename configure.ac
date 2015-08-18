@@ -9,7 +9,10 @@ AM_SILENT_RULES([yes])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([pre-inst-env], [chmod +x pre-inst-env])
 AC_CONFIG_FILES([scripts/shroud], [chmod +x scripts/shroud])
+AC_CONFIG_FILES([shroud/config.scm])
 
 GUILE_PROGS([2.0.11])
+
+AC_PATH_PROG([XCLIP], [xclip])
 
 AC_OUTPUT

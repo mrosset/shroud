@@ -24,7 +24,8 @@
              (guix licenses)
              (guix build-system gnu)
              (gnu))
-(use-package-modules autotools pkg-config guile gnupg)
+
+(use-package-modules autotools pkg-config guile gnupg xdisorg)
 
 (package
   (name "shroud")
@@ -37,7 +38,8 @@
      ("automake" ,automake)))
   (inputs
    `(("guile" ,guile-2.0)
-     ("gnupg" ,gnupg)))
+     ("gnupg" ,gnupg)
+     ("xclip" ,xclip)))
   (synopsis "Simple password manager")
   (description "Shroud is a simple password manager with a
 command-line interface.  The password database is stored as a Scheme

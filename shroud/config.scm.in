@@ -1,3 +1,5 @@
+;;; -*- scheme -*-
+;;;
 ;;; Shroud
 ;;; Copyright © 2015 David Thompson <davet@gnu.org>
 ;;;
@@ -15,6 +17,9 @@
 ;;; along with Shroud.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (shroud config)
-  #:export (%shroud-version))
+  #:export (%shroud-version
+            %xclip))
 
 (define %shroud-version "0.1")
+
+(define %xclip "@XCLIP@")

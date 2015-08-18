@@ -9,3 +9,4 @@
 /scripts/shroud
 /Makefile
 *.go
+/shroud/config.scm

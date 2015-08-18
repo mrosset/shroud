@@ -20,6 +20,7 @@
   #:use-module (ice-9 rdelim)
   #:use-module (ice-9 vlist)
   #:use-module (srfi srfi-1)
+  #:use-module (shroud config)
   #:export (vhash-ref
             vhash-replace
             vhash-values
@@ -28,6 +29,7 @@
             gpg-binary
             call-with-encrypted-output-file
             call-with-decrypted-input-file
+            call-with-clipboard
             mkdir-p))
 
 (define (vhash-ref vhash key)
@@ -114,6 +116,10 @@ FILE."
                                  "--no-tty" "--batch" "--yes"
                                  "--decrypt" ,file)
           proc)))))
+
+(define (call-with-clipboard proc)
+  "Call PROC with an open output port to the X clipboard."
+  (call-with-output-pipe* (list %xclip "-selection" "clipboard") proc))
 
 ;; Written by Ludovic Courtès for GNU Guix.
 (define (mkdir-p dir)
