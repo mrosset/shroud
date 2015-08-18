@@ -57,9 +57,12 @@ Show secret named ID.~%")
 (define (shroud-show config db . args)
   (let* ((opts   (process-args args))
          (id     (leave-if-false (assq-ref opts 'id)
-                                 "No secret ID given"))
+                                 "no secret ID given"))
          (keys   (alist-pick opts 'key))
          (secret (vhash-ref (secrets-by-id (force db)) id)))
+
+    (unless secret
+      (leave "secret '~a' does not exist" id))
 
     (match keys
       (()
