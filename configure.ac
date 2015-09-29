@@ -13,6 +13,7 @@ AC_CONFIG_FILES([shroud/config.scm])
 
 GUILE_PROGS([2.0.11])
 
+AC_PATH_PROGS([GPG], [gpg gpg2])
 AC_PATH_PROG([XCLIP], [xclip])
 
 AC_OUTPUT

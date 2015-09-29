@@ -116,7 +116,7 @@ ARGS is the list of arguments received by the 'throw' handler."
 
 (define %default-config
   `((database-file . ,(string-append (getenv "HOME") "/.config/shroud/db.gpg"))
-    (gpg-binary    . "gpg")))
+    (gpg-binary    . ,%gpg)))
 
 (define (load-config)
   "Load and evaluate user configuration file."

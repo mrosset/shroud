@@ -18,8 +18,11 @@
 
 (define-module (shroud config)
   #:export (%shroud-version
+            %gpg
             %xclip))
 
 (define %shroud-version "0.1")
+
+(define %gpg "@GPG@")
 
 (define %xclip "@XCLIP@")
