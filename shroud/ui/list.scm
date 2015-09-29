@@ -52,4 +52,4 @@ Show the names of all secrets in the database.~%")
               db)
 
     ;; We don't alter the database.
-    db))
+    #f))

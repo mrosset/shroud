@@ -174,6 +174,6 @@ ARGS is the list of arguments received by the 'throw' handler."
                 (result (parameterize ((program-name (make-program-name
                                                       command)))
                           (apply proc config db args))))
-           (unless (eq? db result)
+           (when result
              (mkdir-p (dirname db-file))
              (save-secrets result db-file user-id))))))))

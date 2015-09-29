@@ -93,4 +93,4 @@ Show secret named ID.~%")
         (display-secret secret keys))
 
     ;; Database remains unaltered.
-    db))
+    #f))
