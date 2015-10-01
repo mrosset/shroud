@@ -37,6 +37,9 @@ SUFFIXES = .scm .go
 moddir=$(prefix)/share/guile/site/2.0
 godir=$(libdir)/guile/2.0/ccache
 
+bin_SCRIPTS =					\
+  scripts/shroud
+
 SOURCES = 					\
   shroud/config.scm				\
   shroud/utils.scm				\
