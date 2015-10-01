@@ -1,6 +1,6 @@
 dnl -*- Autoconf -*-
 
-AC_INIT(Shroud, 0.1)
+AC_INIT(Shroud, 0.1.1)
 AC_CONFIG_SRCDIR(shroud)
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([color-tests -Wall -Wno-portability foreign])
