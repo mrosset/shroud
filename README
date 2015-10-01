@@ -25,7 +25,10 @@ arbitrary set of key/value data pairs.
     # Show a single value in a secret:
     shroud show bank-account password
 
-    # Delete a secret
+    # Copy a password directly to X clipboard:
+    shroud show -c bank-account password
+
+    # Delete a secret:
     shroud remove bank-account
   #+END_SRC
 
