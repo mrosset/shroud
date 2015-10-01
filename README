@@ -44,3 +44,18 @@ arbitrary set of key/value data pairs.
   #+BEGIN_SRC sh
     ./bootstrap && ./configure && make && make install
   #+END_SRC
+
+  Depending on your chosen installation prefix via the =--prefix=
+  option to the configure script (which defaults to =/usr/local=,
+  users may need to setup the =GUILE_LOAD_PATH= and
+  =GUILE_LOAD_COMPILED_PATH= environment variables to include the
+  directory where Shroud's Guile modules were installed.
+
+  For example, GNU Bash users may add the following snippet to their
+  =$HOME/.bash_profile=:
+
+  #+BEGIN_SRC sh
+    export GUILE_LOAD_PATH=/usr/local/share/guile/2.0
+    export GUILE_LOAD_COMPILED_PATH=/usr/local/share/guile/2.0
+    export PATH=/usr/local/bin:$PATH
+  #+END_SRC
