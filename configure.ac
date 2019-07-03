@@ -11,7 +11,8 @@ AC_CONFIG_FILES([pre-inst-env], [chmod +x pre-inst-env])
 AC_CONFIG_FILES([scripts/shroud], [chmod +x scripts/shroud])
 AC_CONFIG_FILES([shroud/config.scm])
 
-GUILE_PROGS([2.0.11])
+GUILE_PKG([3.0 2.2 2.0])
+GUILE_PROGS
 
 AC_PATH_PROGS([GPG], [gpg gpg2])
 AC_PATH_PROG([XCLIP], [xclip])
