@@ -1,5 +1,6 @@
 ## Shroud
 ## Copyright © 2015 David Thompson <davet@gnu.org>
+## Copyright (C) 2019 by Amar Singh<nly@disroot.org>
 ##
 ## Shroud is free software; you can redistribute it and/or modify it
 ## under the terms of the GNU General Public License as published by
@@ -34,8 +35,8 @@ SUFFIXES = .scm .go
 .scm.go:
 	$(AM_V_GEN)$(top_builddir)/pre-inst-env $(GUILE_TOOLS) compile $(GUILE_WARNINGS) -o "$@" "$<"
 
-moddir=$(prefix)/share/guile/site/2.0
-godir=$(libdir)/guile/2.0/ccache
+moddir=$(prefix)/share/guile/site/$(GUILE_EFFECTIVE_VERSION)
+godir=$(libdir)/guile/$(GUILE_EFFECTIVE_VERSION)/site-ccache
 
 bin_SCRIPTS =					\
   scripts/shroud
