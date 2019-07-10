@@ -54,3 +54,8 @@ SOURCES = 					\
 EXTRA_DIST +=					\
   pre-inst-env.in				\
   package.scm
+
+publish: distcheck
+	gpg --sign --detach-sign --armor --yes shroud-$(VERSION).tar.gz && \
+        scp shroud-$(VERSION).tar.gz shroud-$(VERSION).tar.gz.asc \
+	    blog@dthompson.us:/var/www/files/shroud/
