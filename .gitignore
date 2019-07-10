@@ -10,3 +10,5 @@
 /Makefile
 *.go
 /shroud/config.scm
+*.tar.gz
+*.asc
